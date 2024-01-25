@@ -61,7 +61,18 @@ public class StockPriceHistoryDao {
 
         List<StocksPriceHistoryVo> stocksPriceHistoryList = namedParameterJdbcTemplate.query(sqlQuery,
                 mapSqlParameterSource,
-                new PriceHistoryRowMapper());
+                (rs, rowNum)->{
+                    StocksPriceHistoryVo stocksPriceHistoryVo = new StocksPriceHistoryVo();
+
+                    stocksPriceHistoryVo.setTickerSymbol(rs.getString("ticker_symbol"));
+                    stocksPriceHistoryVo.setTradingDate(rs.getDate("trading_date").toLocalDate());
+                    stocksPriceHistoryVo.setOpenPrice(rs.getBigDecimal("open_price"));
+                    stocksPriceHistoryVo.setClosePrice(rs.getBigDecimal("close_price"));
+                    stocksPriceHistoryVo.setVolume(rs.getLong("volume"));
+
+
+                    return stocksPriceHistoryVo;
+                });
 
 
         return stocksPriceHistoryList;
