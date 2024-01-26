@@ -83,6 +83,13 @@ public class StocksController {
         return marketAnalyticsService.getAllStockFundamentals();
     }
 
+    @PostMapping(value = "/getAllStockFundamentalsJdbc1")
+    public List<StockFundamentalsWithnamesVo> getAllStockFundamentalsJdbc1(@RequestBody List<String> tickerSymbolsList){
+
+        LOGGER.debug("In the getAllStockFundamentalsJdbc() method of the class {}",getClass());
+        return marketAnalyticsService.getAllStockFundamentals1(tickerSymbolsList);
+    }
+
     @PostMapping(value = "/getGivenStockDetailsJdbc")
     public List<StockFundamentalsWithnamesVo> getGivenStockDetailsJdbc(@RequestBody List<String> tickerSymbols){
         return marketAnalyticsService.getGivenTickerDetails(tickerSymbols);

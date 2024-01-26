@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MarketAnalyticsService {
@@ -82,6 +83,16 @@ public class MarketAnalyticsService {
 
 
         return stockfundamentalsList;
+    }
+    public List<StockFundamentalsWithnamesVo> getAllStockFundamentals1(List<String> tickerSymbolsList){
+
+        List<StockFundamentalsWithnamesVo> stockfundamentalsList1= stockFundamentalsWithNamesDao.getallStocksWithNames();
+
+        List<StockFundamentalsWithnamesVo> finalGivenTickerDetails = stockfundamentalsList1.stream()
+                .filter((tickerList -> tickerSymbolsList.contains(tickerList.getTickerSymbol())))
+                .collect(Collectors.toList());
+        System.out.println(finalGivenTickerDetails);
+        return finalGivenTickerDetails;
     }
 
     public List<StockFundamentalsWithnamesVo> getGivenTickerDetails(List<String> tickerSymbols){
