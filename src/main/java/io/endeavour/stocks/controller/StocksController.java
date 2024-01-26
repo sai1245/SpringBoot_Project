@@ -1,5 +1,6 @@
 package io.endeavour.stocks.controller;
 
+import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.service.MarketAnalyticsService;
 import io.endeavour.stocks.vo.StockFundamentalsWithnamesVo;
 import io.endeavour.stocks.vo.StockPriceHistoryRequestVo;
@@ -80,6 +81,11 @@ public class StocksController {
 
         LOGGER.debug("In the getAllStockFundamentalsJdbc() method of the class {}",getClass());
         return marketAnalyticsService.getAllStockFundamentals();
+    }
+
+    @PostMapping(value = "/getGivenStockDetailsJdbc")
+    public List<StockFundamentalsWithnamesVo> getGivenStockDetailsJdbc(@RequestBody List<String> tickerSymbols){
+        return marketAnalyticsService.getGivenTickerDetails(tickerSymbols);
     }
 
     @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})

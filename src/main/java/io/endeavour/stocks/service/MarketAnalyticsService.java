@@ -80,7 +80,12 @@ public class MarketAnalyticsService {
         LOGGER.debug("Entered teh method getAllStockFundamentals() of the class {}",getClass());
         List<StockFundamentalsWithnamesVo> stockfundamentalsList= stockFundamentalsWithNamesDao.getallStocksWithNames();
 
+
         return stockfundamentalsList;
+    }
+
+    public List<StockFundamentalsWithnamesVo> getGivenTickerDetails(List<String> tickerSymbols){
+        return stockFundamentalsWithNamesDao.getGivenStocksWithNames(tickerSymbols);
     }
 
 
