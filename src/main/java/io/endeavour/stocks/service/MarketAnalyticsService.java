@@ -2,6 +2,8 @@ package io.endeavour.stocks.service;
 
 import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
+import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.repository.stocks.StockFundamentalRepository;
 import io.endeavour.stocks.vo.StockFundamentalsWithnamesVo;
 import io.endeavour.stocks.vo.StocksPriceHistoryVo;
 import org.slf4j.Logger;
@@ -19,17 +21,22 @@ import java.util.stream.Collectors;
 @Service
 public class MarketAnalyticsService {
 
+   StockFundamentalRepository stockFundamentalRepository;
     StockPriceHistoryDao stockPriceHistoryDao;
 
     StockFundamentalsWithNamesDao stockFundamentalsWithNamesDao;
+
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MarketAnalyticsService.class);
 
     @Autowired
     public MarketAnalyticsService(StockPriceHistoryDao stockPriceHistoryDao,
-                                  StockFundamentalsWithNamesDao stockFundamentalsWithNamesDao) {
+                                  StockFundamentalsWithNamesDao stockFundamentalsWithNamesDao,
+                                  StockFundamentalRepository stockFundamentalRepository) {
         this.stockPriceHistoryDao = stockPriceHistoryDao;
         this.stockFundamentalsWithNamesDao=stockFundamentalsWithNamesDao;
+        this.stockFundamentalRepository=stockFundamentalRepository;
     }
 
     public List<StocksPriceHistoryVo> getSingleStockPriceHistory(String tickerSymbol,
@@ -97,6 +104,10 @@ public class MarketAnalyticsService {
 
     public List<StockFundamentalsWithnamesVo> getGivenTickerDetails(List<String> tickerSymbols){
         return stockFundamentalsWithNamesDao.getGivenStocksWithNames(tickerSymbols);
+    }
+
+    public List<StockFundamentals> getAllStockFundamentalsJpa(){
+        return stockFundamentalRepository.findAll();
     }
 
 
