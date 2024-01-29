@@ -4,16 +4,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class StocksPriceHistoryVo {
+public class StocksPriceHistoryVO {
 
     private String tickerSymbol;
-
     private LocalDate tradingDate;
-
     private BigDecimal openPrice;
-    private BigDecimal closePrice;
-
-    private Long volume;
+    private  BigDecimal closePrice;
+    private long volume;
 
     public String getTickerSymbol() {
         return tickerSymbol;
@@ -47,19 +44,19 @@ public class StocksPriceHistoryVo {
         this.closePrice = closePrice;
     }
 
-    public Long getVolume() {
+    public long getVolume() {
         return volume;
     }
 
-    public void setVolume(Long volume) {
+    public void setVolume(long volume) {
         this.volume = volume;
     }
 
     @Override
     public String toString() {
-        return "StocksPriceHistoryVo{" +
+        return "StocksPriceHistoryVO{" +
                 "tickerSymbol='" + tickerSymbol + '\'' +
-                ", tradingDate=" + tradingDate +
+                ", tradingDate='" + tradingDate + '\'' +
                 ", openPrice=" + openPrice +
                 ", closePrice=" + closePrice +
                 ", volume=" + volume +
@@ -70,12 +67,12 @@ public class StocksPriceHistoryVo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StocksPriceHistoryVo that = (StocksPriceHistoryVo) o;
-        return Objects.equals(tickerSymbol, that.tickerSymbol);
+        StocksPriceHistoryVO that = (StocksPriceHistoryVO) o;
+        return volume == that.volume && Objects.equals(tickerSymbol, that.tickerSymbol) && Objects.equals(tradingDate, that.tradingDate) && Objects.equals(openPrice, that.openPrice) && Objects.equals(closePrice, that.closePrice);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(tickerSymbol);
+        return Objects.hash(tickerSymbol, tradingDate, openPrice, closePrice, volume);
     }
 }

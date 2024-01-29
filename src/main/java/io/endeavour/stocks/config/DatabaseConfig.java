@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
@@ -12,9 +13,9 @@ import javax.sql.DataSource;
 public class DatabaseConfig {
 
     /**
-     * Method to create a dataSource representing a stocks DB
-     * Rge prefix spring.datasource will tell spring to pick 4 corresponding parameters from the application properties file
-     * @return  DataSource
+     * Method to create a DataSource representing the stocks DB
+     * The prefix given spring.datasource will tell Spring to pickup for corresponding parameters from the applications.properties file
+     * @return DataSource
      */
     @Bean(name = "dataSource")
     @ConfigurationProperties(prefix = "spring.datasource")
@@ -22,17 +23,10 @@ public class DatabaseConfig {
         return DataSourceBuilder.create().build();
     }
 
-
-    /**
-     *Method to create a dataSource representing a stocks DB
-     *Rge prefix spring.datasource-crudjpa will tell spring to pick 4 corresponding parameters from the application properties file
-     *@return  DataSource
-     */
-    @Bean(name  ="dataSourceCurd")
+    @Bean(name = "dataSourceCrud")
     @ConfigurationProperties(prefix = "spring.datasource-crudjpa")
-    public DataSource getDataSourceCurd(){
+    public DataSource getDataSourceCrud(){
         return DataSourceBuilder.create().build();
     }
-
 
 }

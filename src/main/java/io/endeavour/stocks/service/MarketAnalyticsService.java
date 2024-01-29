@@ -1,15 +1,19 @@
 package io.endeavour.stocks.service;
 
+import io.endeavour.stocks.controller.StocksController;
 import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
+import io.endeavour.stocks.entity.stocks.SectorLookup;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
-import io.endeavour.stocks.repository.stocks.StockFundamentalRepository;
-import io.endeavour.stocks.vo.StockFundamentalsWithnamesVo;
-import io.endeavour.stocks.vo.StocksPriceHistoryVo;
+import io.endeavour.stocks.repository.stocks.SectorLookupRepository;
+import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
+import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
+import io.endeavour.stocks.vo.StocksPriceHistoryVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -21,93 +25,78 @@ import java.util.stream.Collectors;
 @Service
 public class MarketAnalyticsService {
 
-   StockFundamentalRepository stockFundamentalRepository;
+    private final static Logger LOGGER= LoggerFactory.getLogger(MarketAnalyticsService.class);
     StockPriceHistoryDao stockPriceHistoryDao;
 
+    @Autowired
     StockFundamentalsWithNamesDao stockFundamentalsWithNamesDao;
 
-
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MarketAnalyticsService.class);
+    @Autowired
+    StockFundamentalsRepository stockFundamentalsRepository;
 
     @Autowired
-    public MarketAnalyticsService(StockPriceHistoryDao stockPriceHistoryDao,
-                                  StockFundamentalsWithNamesDao stockFundamentalsWithNamesDao,
-                                  StockFundamentalRepository stockFundamentalRepository) {
+    SectorLookupRepository sectorLookupRepository;
+
+    @Autowired
+    public MarketAnalyticsService(StockPriceHistoryDao stockPriceHistoryDao) {
         this.stockPriceHistoryDao = stockPriceHistoryDao;
-        this.stockFundamentalsWithNamesDao=stockFundamentalsWithNamesDao;
-        this.stockFundamentalRepository=stockFundamentalRepository;
     }
 
-    public List<StocksPriceHistoryVo> getSingleStockPriceHistory(String tickerSymbol,
-                                                                 LocalDate fromDate,
-                                                                 LocalDate toDate,
-                                                                 Optional<String> sortFieldOptional,
-                                                                 Optional<String> sortDirectionOptional){
-
-
-        List<StocksPriceHistoryVo> singleStockPriceHistory = stockPriceHistoryDao.
-                getSingleStockPriceHistory(tickerSymbol, fromDate, toDate);
+    public List<StocksPriceHistoryVO> getSingleStockPriceHistory(String tickerSymbol, LocalDate fromDate, LocalDate toDate,
+                                                                 Optional<String> sortFieldOptional, Optional<String> sortDirectionOptional){
+        List<StocksPriceHistoryVO> stockPriceHistoryList = stockPriceHistoryDao.getSingleStockPriceHistory(tickerSymbol, fromDate, toDate);
         String fieldToSortBy = sortFieldOptional.orElse("TradingDate");
         String directionToSortBy = sortDirectionOptional.orElse("asc");
 
-        Comparator sortComparator = switch (fieldToSortBy.toUpperCase()){
-            case ("OPENPRICE")-> Comparator.comparing(StocksPriceHistoryVo::getOpenPrice);
-            case ("CLOSEPRICE")-> Comparator.comparing(StocksPriceHistoryVo::getClosePrice);
-            case ("VOLUME")-> Comparator.comparing(StocksPriceHistoryVo::getVolume);
-            case("TRADINGDATE")-> Comparator.comparing(StocksPriceHistoryVo::getTradingDate);
+        Comparator sortComparator= switch (fieldToSortBy.toUpperCase()){
+            case ("OPENPRICE")-> Comparator.comparing(StocksPriceHistoryVO::getOpenPrice);
+            case ("CLOSEPRICE")->Comparator.comparing(StocksPriceHistoryVO::getClosePrice);
+            case ("VOLUME")->Comparator.comparing(StocksPriceHistoryVO::getVolume);
+            case ("TRADINGDATE")->Comparator.comparing(StocksPriceHistoryVO::getTradingDate);
             default -> {
+                LOGGER.error("Value entered for sortField is incorrect. Value entered is {} : ",fieldToSortBy);
+                throw new IllegalArgumentException("Value Entered for Sort field is Incorrect. Value entered is: " + fieldToSortBy);
 
-                LOGGER.error("Value Enetered for the sortFieldBy is incorrect.Value entered is :{}",fieldToSortBy);
-                throw new IllegalArgumentException("Value Enetered for the sortFieldBy is incorrect." +
-                        " Value entered is : "+fieldToSortBy);
             }
+
         };
-
-
-        if(directionToSortBy.equalsIgnoreCase("DESC")){
+        if (directionToSortBy.equalsIgnoreCase("desc")){
             sortComparator=sortComparator.reversed();
         }
+        stockPriceHistoryList.sort(sortComparator);
 
-//        Collections.sort(singleStockPriceHistory,sortComparator);
-
-        singleStockPriceHistory.sort(sortComparator);
-
-        return singleStockPriceHistory;
-
+        return stockPriceHistoryList;
     }
 
-    public List<StocksPriceHistoryVo> getMultipleStockPriceHistory(List<String> tickerSymbols,
-                                                                   LocalDate fromDate,
-                                                                   LocalDate toDate){
-        return stockPriceHistoryDao.getMultipleStockPriceHistory(tickerSymbols, fromDate, toDate);
+    public List<StocksPriceHistoryVO> getMultipleStockPriceHistory(List<String> tickerList, LocalDate fromDate, LocalDate toDate){
+        return stockPriceHistoryDao.getMultipleStockPriceHistory(tickerList,fromDate,toDate);
     }
 
-    public List<StockFundamentalsWithnamesVo> getAllStockFundamentals(){
-
-        LOGGER.debug("Entered teh method getAllStockFundamentals() of the class {}",getClass());
-        List<StockFundamentalsWithnamesVo> stockfundamentalsList= stockFundamentalsWithNamesDao.getallStocksWithNames();
-
-
-        return stockfundamentalsList;
+    public List<StockFundamentalsWithNamesVO> getAllStockFundamentals(){
+        LOGGER.debug("Entered the method getAllStockFundamentals() of the class {}",getClass());
+        List<StockFundamentalsWithNamesVO> stockFundamentalsList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
+        return  stockFundamentalsList;
     }
-    public List<StockFundamentalsWithnamesVo> getAllStockFundamentals1(List<String> tickerSymbolsList){
 
-        List<StockFundamentalsWithnamesVo> stockfundamentalsList1= stockFundamentalsWithNamesDao.getallStocksWithNames();
-
-        List<StockFundamentalsWithnamesVo> finalGivenTickerDetails = stockfundamentalsList1.stream()
-                .filter((tickerList -> tickerSymbolsList.contains(tickerList.getTickerSymbol())))
+    public List<StockFundamentalsWithNamesVO> getAllStockFundamentalsForSpecificTickerSymbols(List<String> tickerSymbolList){
+        List<StockFundamentalsWithNamesVO> allStockFundamentalsWithNamesVOList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
+        List<StockFundamentalsWithNamesVO> listOfRequiredStocks = allStockFundamentalsWithNamesVOList.stream()
+                .filter(tickerList -> tickerSymbolList.contains(tickerList.getTickerSymbol()))
                 .collect(Collectors.toList());
-        System.out.println(finalGivenTickerDetails);
-        return finalGivenTickerDetails;
+        return listOfRequiredStocks;
     }
 
-    public List<StockFundamentalsWithnamesVo> getGivenTickerDetails(List<String> tickerSymbols){
-        return stockFundamentalsWithNamesDao.getGivenStocksWithNames(tickerSymbols);
+    public List<StockFundamentalsWithNamesVO> getAllStockFundamentalsForGivenTickerSymbolsWithSQLQuery(List<String> tickerSymbolList ){
+
+        return stockFundamentalsWithNamesDao.gellStockFundamentalDetailsWithNames(tickerSymbolList);
     }
 
-    public List<StockFundamentals> getAllStockFundamentalsJpa(){
-        return stockFundamentalRepository.findAll();
+    public List<StockFundamentals> getAllStockFundamentalsWithJPA(){
+        return stockFundamentalsRepository.findAll();
+    }
+
+    public  List<SectorLookup> getAllSectorsWithItsSubSectors(){
+        return sectorLookupRepository.findAll();
     }
 
 

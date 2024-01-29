@@ -4,16 +4,11 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
-public class StockPriceHistoryRequestVo {
-
-
+public class StockPriceHistoryRequestVO {
     private List<String> tickersList;
-
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate fromDate;
-
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate toDate;
 
@@ -43,23 +38,10 @@ public class StockPriceHistoryRequestVo {
 
     @Override
     public String toString() {
-        return "StockPriceHistoryRequestVo{" +
+        return "StockPriceHistoryRequestVO{" +
                 "tickersList=" + tickersList +
                 ", fromDate=" + fromDate +
                 ", toDate=" + toDate +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StockPriceHistoryRequestVo that = (StockPriceHistoryRequestVo) o;
-        return Objects.equals(tickersList, that.tickersList) && Objects.equals(fromDate, that.fromDate) && Objects.equals(toDate, that.toDate);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tickersList, fromDate, toDate);
     }
 }

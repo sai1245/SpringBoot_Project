@@ -1,25 +1,16 @@
-package io.endeavour.stocks.entity.stocks;
+package io.endeavour.stocks.vo;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.util.Objects;
 
-@Entity
-@Table(name = "stock_fundamentals",schema = "endeavour")
-public class StockFundamentals {
-    @Column(name = "ticker_symbol")
-    @Id
+public class StockFundamentalsWithNamesVO {
+
     private String tickerSymbol;
-    @Column(name = "sector_id")
+    private String tickerName;
     private int sectorID;
-    @Column(name = "subsector_id")
+    private String sectorName;
     private int subSectorID;
-    @Column(name = "market_cap")
+    private String subSectorName;
     private BigDecimal marketCap;
-    @Column(name = "current_ratio")
     private BigDecimal currentRatio;
 
     public String getTickerSymbol() {
@@ -30,6 +21,14 @@ public class StockFundamentals {
         this.tickerSymbol = tickerSymbol;
     }
 
+    public String getTickerName() {
+        return tickerName;
+    }
+
+    public void setTickerName(String tickerName) {
+        this.tickerName = tickerName;
+    }
+
     public int getSectorID() {
         return sectorID;
     }
@@ -38,12 +37,28 @@ public class StockFundamentals {
         this.sectorID = sectorID;
     }
 
+    public String getSectorName() {
+        return sectorName;
+    }
+
+    public void setSectorName(String sectorName) {
+        this.sectorName = sectorName;
+    }
+
     public int getSubSectorID() {
         return subSectorID;
     }
 
     public void setSubSectorID(int subSectorID) {
         this.subSectorID = subSectorID;
+    }
+
+    public String getSubSectorName() {
+        return subSectorName;
+    }
+
+    public void setSubSectorName(String subSectorName) {
+        this.subSectorName = subSectorName;
     }
 
     public BigDecimal getMarketCap() {
@@ -64,25 +79,15 @@ public class StockFundamentals {
 
     @Override
     public String toString() {
-        return "StockFundamentals{" +
+        return "StockFundamentalsWithNamesVO{" +
                 "tickerSymbol='" + tickerSymbol + '\'' +
+                ", tickerName='" + tickerName + '\'' +
                 ", sectorID=" + sectorID +
-                ", subSectorID=" + subSectorID +
+                ", sectorName='" + sectorName + '\'' +
+                ", sunSectorID=" + subSectorID +
+                ", sunSectorName='" + subSectorName + '\'' +
                 ", marketCap=" + marketCap +
                 ", currentRatio=" + currentRatio +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StockFundamentals that = (StockFundamentals) o;
-        return Objects.equals(tickerSymbol, that.tickerSymbol);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(tickerSymbol);
     }
 }
