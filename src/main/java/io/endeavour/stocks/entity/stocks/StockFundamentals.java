@@ -12,18 +12,28 @@ public class StockFundamentals {
     @Column(name = "ticker_symbol")
     @Id
     private String tickerSymbol;
-
-    @OneToOne
-    @JoinColumn(name = "sector_id",referencedColumnName = "sector_id")
-    private SectorLookup sectorLookup;
-
-    @OneToOne
-    @JoinColumn(name = "subsector_id",referencedColumnName = "subsector_id")
-    private SubSectorLookup subSectorLookup;
     @Column(name = "market_cap")
     private BigDecimal marketCap;
     @Column(name = "current_ratio")
     private BigDecimal currentRatio;
+
+    @OneToOne
+    @JoinColumn(name = "sector_id", referencedColumnName = "sector_id")
+    private SectorLookup sectorLookup;
+
+    @OneToOne
+    @JoinColumn(name = "subsector_id", referencedColumnName = "subsector_id")
+    private SubSectorLookup subSectorLookup;
+
+    @OneToOne
+    @JsonIgnore
+    @JoinColumn(name = "ticker_symbol")
+    private StocksLookup stocksLookup;
+
+//    @OneToOne
+//    @JoinColumn(name = "ticker_symbol", referencedColumnName = "ticker_symbol")
+//    @MapsId
+//    public StocksLookup stocksLookup;
 
     public int getSectorId(){
         return sectorLookup.getSectorID();
@@ -40,22 +50,8 @@ public class StockFundamentals {
     public String getSubSectorName(){
         return subSectorLookup.getSubSectorName();
     }
-@JsonIgnore
-    public SubSectorLookup getSubSectorLookup() {
-        return subSectorLookup;
-    }
-
-    public void setSubSectorLookup(SubSectorLookup subSectorLookup) {
-        this.subSectorLookup = subSectorLookup;
-    }
-
-    @JsonIgnore
-    public SectorLookup getSectorLookup() {
-        return sectorLookup;
-    }
-
-    public void setSectorLookup(SectorLookup sectorLookup) {
-        this.sectorLookup = sectorLookup;
+    public String getTickername(){
+        return stocksLookup.getTickerName();
     }
 
     public String getTickerSymbol() {
@@ -65,7 +61,6 @@ public class StockFundamentals {
     public void setTickerSymbol(String tickerSymbol) {
         this.tickerSymbol = tickerSymbol;
     }
-
 
     public BigDecimal getMarketCap() {
         return marketCap;
@@ -83,17 +78,31 @@ public class StockFundamentals {
         this.currentRatio = currentRatio;
     }
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        StockFundamentals that = (StockFundamentals) o;
-        return Objects.equals(tickerSymbol, that.tickerSymbol);
+    @JsonIgnore
+    public SectorLookup getSectorLookup() {
+        return sectorLookup;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(tickerSymbol);
+    public void setSectorLookup(SectorLookup sectorLookup) {
+        this.sectorLookup = sectorLookup;
+    }
+
+    @JsonIgnore
+    public SubSectorLookup getSubSectorLookup() {
+        return subSectorLookup;
+    }
+
+    public void setSubSectorLookup(SubSectorLookup subSectorLookup) {
+        this.subSectorLookup = subSectorLookup;
+    }
+
+
+    @JsonIgnore
+    public StocksLookup getStocksLookup() {
+        return stocksLookup;
+    }
+
+    public void setStocksLookup(StocksLookup stocksLookup) {
+        this.stocksLookup = stocksLookup;
     }
 }
