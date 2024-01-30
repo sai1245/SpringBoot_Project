@@ -2,11 +2,13 @@ package io.endeavour.stocks.controller;
 
 import io.endeavour.stocks.entity.stocks.SectorLookup;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.entity.stocks.StockPriceHistory;
 import io.endeavour.stocks.entity.stocks.SubSectorLookup;
 import io.endeavour.stocks.service.MarketAnalyticsService;
 import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
 import io.endeavour.stocks.vo.StockPriceHistoryRequestVO;
 import io.endeavour.stocks.vo.StocksPriceHistoryVO;
+import io.endeavour.stocks.vo.TopStockBySectorVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -111,6 +112,20 @@ public class StocksController {
     @GetMapping(value = "/getAllSubSectorsWithSectors")
     public List<SubSectorLookup> getAllSubSectorsWithSectors(){
         return marketAnalyticsService.getAllSubSectorsWithSectors();
+    }
+
+
+    @GetMapping(value = "/getStockPriceHistoryDetails")
+    public ResponseEntity<StockPriceHistory>
+    getStockPriceHistoryDetails(@RequestParam(value = "tickerSymbol") String tickerSymbol,
+                                @RequestParam(value = "tradingDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate){
+        return ResponseEntity.of(marketAnalyticsService.getStockPriceHistory(tickerSymbol,tradingDate));
+    }
+
+    @GetMapping(value = "/getTopStockBySector")
+    public List<TopStockBySectorVO> getTopStockBySector()
+    {
+        return marketAnalyticsService.getTopStockBySector();
     }
     @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
     public ResponseEntity generateExceptionResponse(Exception e){

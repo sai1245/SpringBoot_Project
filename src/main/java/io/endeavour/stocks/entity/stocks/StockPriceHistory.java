@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "stock_price_history",schema = "endeavour")
+@Table(name = "stocks_price_history",schema = "endeavour")
 @IdClass(value = StockPriceHistoryKey.class)
 public class StockPriceHistory {
 

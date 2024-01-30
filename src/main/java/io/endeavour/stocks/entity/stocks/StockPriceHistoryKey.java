@@ -1,8 +1,9 @@
 package io.endeavour.stocks.entity.stocks;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class StockPriceHistoryKey {
+public class StockPriceHistoryKey implements Serializable {
 
     private String tickerSymbol;
     private LocalDate tradingDate;

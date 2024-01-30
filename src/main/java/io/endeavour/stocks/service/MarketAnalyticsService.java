@@ -1,24 +1,21 @@
 package io.endeavour.stocks.service;
 
-import io.endeavour.stocks.controller.StocksController;
 import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
-import io.endeavour.stocks.entity.stocks.SectorLookup;
-import io.endeavour.stocks.entity.stocks.StockFundamentals;
-import io.endeavour.stocks.entity.stocks.SubSectorLookup;
+import io.endeavour.stocks.entity.stocks.*;
 import io.endeavour.stocks.repository.stocks.SectorLookupRepository;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
+import io.endeavour.stocks.repository.stocks.StockPriceHistoryRepository;
 import io.endeavour.stocks.repository.stocks.SubSectorLookupRepository;
 import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
 import io.endeavour.stocks.vo.StocksPriceHistoryVO;
+import io.endeavour.stocks.vo.TopStockBySectorVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +37,9 @@ public class MarketAnalyticsService {
     SectorLookupRepository sectorLookupRepository;
 
     SubSectorLookupRepository subSectorLookupRepository;
+
+    @Autowired
+    StockPriceHistoryRepository stockPriceHistoryRepository;
 
     @Autowired
     public MarketAnalyticsService(StockPriceHistoryDao stockPriceHistoryDao,
@@ -108,6 +108,19 @@ public class MarketAnalyticsService {
 
     public List<SubSectorLookup> getAllSubSectorsWithSectors(){
         return subSectorLookupRepository.findAll();
+    }
+
+
+    public Optional<StockPriceHistory> getStockPriceHistory(String tickerSymbol, LocalDate tradingDate){
+        StockPriceHistoryKey primaryKeyObj= new StockPriceHistoryKey();
+        primaryKeyObj.setTickerSymbol(tickerSymbol);
+        primaryKeyObj.setTradingDate(tradingDate);
+        return stockPriceHistoryRepository.findById(primaryKeyObj);
+    }
+
+    public List<TopStockBySectorVO> getTopStockBySector()
+    {
+        return stockFundamentalsRepository.getAllTopStocksBySector();
     }
 
 
