@@ -33,6 +33,17 @@ public class Address {
     @JoinColumn(name = "person_id")
     private Person person;
 
+
+    //Custom Method where a real PersonName field does not exist {Custom methods}
+    public String getPersonName(){
+        return person.getFirstName()+" "+person.getLastName();
+    }
+
+    //Custom Method where a real Person id field does not exist { Custo Methods}
+    public int getPersonId(){
+        return person.getPersonID();
+    }
+
     public void setAddressID(int addressID) {
         this.addressID = addressID;
     }

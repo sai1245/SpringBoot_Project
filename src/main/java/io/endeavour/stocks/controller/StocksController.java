@@ -2,6 +2,7 @@ package io.endeavour.stocks.controller;
 
 import io.endeavour.stocks.entity.stocks.SectorLookup;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.entity.stocks.SubSectorLookup;
 import io.endeavour.stocks.service.MarketAnalyticsService;
 import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
 import io.endeavour.stocks.vo.StockPriceHistoryRequestVO;
@@ -105,6 +106,11 @@ public class StocksController {
     @GetMapping(value = "/getSectorsWithSubSectorsList")
     public List<SectorLookup> getSectorsWithSubSectorsList(){
         return marketAnalyticsService.getAllSectorsWithItsSubSectors();
+    }
+
+    @GetMapping(value = "/getAllSubSectorsWithSectors")
+    public List<SubSectorLookup> getAllSubSectorsWithSectors(){
+        return marketAnalyticsService.getAllSubSectorsWithSectors();
     }
     @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
     public ResponseEntity generateExceptionResponse(Exception e){

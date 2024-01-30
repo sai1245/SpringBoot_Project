@@ -44,6 +44,11 @@ public class SubSectorLookup {
         this.sectorLookup = sectorLookup;
     }
 
+//Custom Method Written in the Child Entity to join with the parent Entity and get parent table details.
+    public String getSectorName(){
+        return sectorLookup.getSectorName();
+    }
+
     @Override
     public String toString() {
         return "SubSectorLookup{" +

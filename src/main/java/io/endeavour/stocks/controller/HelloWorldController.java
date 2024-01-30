@@ -12,7 +12,7 @@ public class HelloWorldController {
 
     @GetMapping(value = "/helloworld")
     public String firstMethod(){
-        return "Hello Varun";
+        return "Hello Sai Chowdary";
     }
     @GetMapping(value = "hello/world")
     public String callingHelloWorld(){

@@ -1,5 +1,7 @@
 package io.endeavour.stocks.controller;
 
+import io.endeavour.stocks.StockException;
+import io.endeavour.stocks.entity.crud.Address;
 import io.endeavour.stocks.entity.crud.Person;
 import io.endeavour.stocks.service.CrudService;
 import org.slf4j.Logger;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,4 +51,35 @@ public class CrudController {
     }
 
 
+    @PutMapping(value = "/updatePerson")
+    public Person updatePerson(@RequestBody Optional<Person> personOptional,@RequestParam(name = "personID") Integer personID){
+        if (personOptional.isPresent()){
+            if (personOptional.get().getPersonID()==personID){
+                return crudService.updatePerson(personOptional.get(),personID);
+            }
+            else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "PersonId sent in the url mismatches with Perosn ID in the Object");
+            }
+        }
+        else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Person object sent is null");
+        }
+    }
+
+
+    @DeleteMapping(value = "/deletePerson/{personID}")
+    public void deletePerson(@PathVariable(value = "personID") Integer personID){
+        crudService.deletePerson(personID);
+    }
+
+    @GetMapping(value = "/getAllAddresses")
+    public List<Address> getAllAddresses(){
+        return crudService.getAllAddresses();
+    }
+
+    @ExceptionHandler({StockException.class})
+    public ResponseEntity generateExceptionResponce(Exception e){
+        return ResponseEntity.notFound().header("Error Message", e.getMessage()).build();
+    }
 }
