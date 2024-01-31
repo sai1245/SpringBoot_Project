@@ -1,5 +1,7 @@
 package io.endeavour.stocks.entity.stocks;
 
+import io.endeavour.stocks.vo.TopThreeStockVO;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -14,8 +16,20 @@ public class SectorLookup {
     @Column(name = "sector_name")
     private String sectorName;
 
-    @OneToMany(mappedBy ="sectorLookup", fetch = FetchType.EAGER)
-    List<SubSectorLookup> subSectorLookupList;
+//    @OneToMany(mappedBy ="sectorLookup",fetch = FetchType.EAGER)
+//    List<SubSectorLookup> subSectorLookupList;
+
+
+    @OneToMany(mappedBy = "sectorLookup", fetch = FetchType.EAGER)
+    List<StockFundamentals> topStocksBySector;
+
+    public List<StockFundamentals> getTopStocksBySector() {
+        return topStocksBySector;
+    }
+
+    public void setTopStocksBySector(List<StockFundamentals> topStocksBySector) {
+        this.topStocksBySector = topStocksBySector;
+    }
 
     public Integer getSectorID() {
         return sectorID;
@@ -33,13 +47,13 @@ public class SectorLookup {
         this.sectorName = sectorName;
     }
 
-    public List<SubSectorLookup> getSubSectorLookupList() {
-        return subSectorLookupList;
-    }
-
-    public void setSubSectorLookupList(List<SubSectorLookup> subSectorLookupList) {
-        this.subSectorLookupList = subSectorLookupList;
-    }
+//    public List<SubSectorLookup> getSubSectorLookupList() {
+//        return subSectorLookupList;
+//    }
+//
+//    public void setSubSectorLookupList(List<SubSectorLookup> subSectorLookupList) {
+//        this.subSectorLookupList = subSectorLookupList;
+//    }
 
     @Override
     public String toString() {

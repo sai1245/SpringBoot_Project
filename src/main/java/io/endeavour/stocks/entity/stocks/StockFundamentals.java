@@ -2,6 +2,7 @@ package io.endeavour.stocks.entity.stocks;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.endeavour.stocks.vo.TopStockBySectorVO;
+import io.endeavour.stocks.vo.TopThreeStockVO;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -46,6 +47,42 @@ import java.util.Objects;
                 @ColumnResult(name = "ticker_symbol",type = String.class),
                 @ColumnResult(name = "ticker_name",type = String.class),
                 @ColumnResult(name = "market_cap",type = BigDecimal.class)
+        })
+)
+@NamedNativeQuery(name = "StockFundamentals.TopThreeStocks",query = """
+        with MKTCP_BY_RANK as (
+        select
+            sf.sector_id,
+            sf.ticker_symbol,
+            sl.ticker_name ,
+            sf.market_cap ,
+            rank() over (partition by sf.sector_id order by sf.market_cap desc) as MarketCap_Rank
+        from
+            endeavour.stock_fundamentals sf,
+            endeavour.stocks_lookup sl,
+            endeavour.sector_lookup sl2
+        where
+            sf.ticker_symbol =sl.ticker_symbol and
+            sf.sector_id =sl2.sector_id  and
+            sf.market_cap is not null
+         )
+         select
+            mts.sector_id,
+             mts.ticker_symbol,
+             mts.ticker_name,
+             mts.market_cap
+         from
+            MKTCP_BY_RANK mts
+         where
+          MarketCap_Rank<=3
+        """,resultSetMapping = "StockFundamentals.TopThreeStocksMapping")
+
+@SqlResultSetMapping(name = "StockFundamentals.TopThreeStocksMapping",
+        classes = @ConstructorResult(targetClass = TopThreeStockVO.class, columns ={
+                @ColumnResult(name = "ticker_symbol",type = String.class),
+                @ColumnResult(name = "ticker_name",type = String.class),
+                @ColumnResult(name = "market_cap",type = BigDecimal.class),
+                @ColumnResult(name = "sector_id",type = int.class)
         })
 )
 public class StockFundamentals {
