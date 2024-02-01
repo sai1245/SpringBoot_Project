@@ -131,6 +131,29 @@ public class StocksController {
     public List<SectorLookupUpdated> getThreeStocks(){
         return marketAnalyticsService.getThreeStocks();
     }
+
+    @GetMapping(value = "/getTopNStocksNativeSQL/{number}")
+    public List<StockFundamentals> getTopNStocksNativeSQL(@PathVariable(value = "number") Integer number){
+        return marketAnalyticsService.getTopNStocksNativeSQL(number);
+    }
+
+    @GetMapping(value = "/getTopNStocksNativeJPQL/{number}")
+    public List<StockFundamentals> getTopNStocksNativeJPQL(@PathVariable(value = "number") Integer number){
+        return marketAnalyticsService.getTopNStocksNativeJPQL(number);
+    }
+
+
+    @GetMapping(value = "/getNotNullCurrentRatios")
+    public List<StockFundamentals> getNotNullCurrentRatios(){
+        return marketAnalyticsService.getNotNullCurrentRatios();
+    }
+
+    @GetMapping(value = "/getTopNStocksCriteriaAPI/{number}")
+    public List<StockFundamentals> getTopNStocksCriteriaAPI(@PathVariable(value = "number") Integer number){
+        return marketAnalyticsService.getTopNStocksCriteriaAPI(number);
+    }
+
+
     @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
     public ResponseEntity generateExceptionResponse(Exception e){
         return ResponseEntity.badRequest().body(e.getMessage());

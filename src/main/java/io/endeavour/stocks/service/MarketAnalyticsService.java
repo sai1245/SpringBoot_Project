@@ -37,8 +37,6 @@ public class MarketAnalyticsService {
     @Autowired
     StockPriceHistoryRepository stockPriceHistoryRepository;
 
-    @Autowired
-    StockFundamentalsRepo stockFundamentalsRepo;
 
     @Autowired
     public MarketAnalyticsService(StockPriceHistoryDao stockPriceHistoryDao,
@@ -123,16 +121,17 @@ public class MarketAnalyticsService {
     }
 
    public List<TopThreeStockVO> getTopThreeStocks(){
-        return stockFundamentalsRepo.getTopThreeStocks();
+        return stockFundamentalsRepository.getTopThreeStocks();
    }
 
    public List<SectorLookupUpdated> getThreeStocks(){
-       List<TopThreeStockVO> topThreeStockVOS=stockFundamentalsRepo.getTopThreeStocks();
+       List<TopThreeStockVO> topThreeStockVOS=stockFundamentalsRepository.getTopThreeStocks();
        List<SectorLookup> stocksListWithId=sectorLookupRepository.findAll();
 
        Map<Integer,SectorLookupUpdated> StocksWithSectorMap=new HashMap<>();
 
-       for (SectorLookup sectorLookup:stocksListWithId) {
+       for (SectorLookup sectorLookup:stocksListWithId)
+       {
            List<TopThreeStockVO> collectedStocksList = topThreeStockVOS.stream()
                    .filter(stock -> sectorLookup.getSectorID().equals(stock.getSectorId()))
                    .collect(Collectors.toList());
@@ -143,9 +142,26 @@ public class MarketAnalyticsService {
        }
 
        List<SectorLookupUpdated> finalResult=new ArrayList<>(StocksWithSectorMap.values());     //.values() ArrayList<>((Collection) StocksWithSectorMap)
+       finalResult.sort(Comparator.comparing(SectorLookupUpdated::getSectorId));
 
 
        return finalResult;
    }
+
+   public List<StockFundamentals> getTopNStocksNativeSQL(Integer number){
+        return stockFundamentalsRepository.getTopNStocksNativeSQL(number);
+   }
+
+    public List<StockFundamentals> getTopNStocksNativeJPQL(Integer number){
+        return stockFundamentalsWithNamesDao.getTopNStocksJPQL(number);
+    }
+
+    public List<StockFundamentals> getNotNullCurrentRatios(){
+        return stockFundamentalsRepository.getNotNullCurrentRatios();
+    }
+
+    public List<StockFundamentals> getTopNStocksCriteriaAPI(Integer number){
+        return stockFundamentalsWithNamesDao.getTopNStocksCriteriaAPI(number);
+    }
 
 }

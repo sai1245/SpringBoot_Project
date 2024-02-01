@@ -12,7 +12,7 @@ public class SectorLookup {
 
     @Column(name = "sector_id")
     @Id
-    private Integer sectorID;
+    private int sectorID;
     @Column(name = "sector_name")
     private String sectorName;
 
