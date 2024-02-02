@@ -153,6 +153,12 @@ public class StocksController {
         return marketAnalyticsService.getTopNStocksCriteriaAPI(number);
     }
 
+    @GetMapping(value = "/tradingHistoryForStocksList")
+    public StockHistoryVO tradingHistoryForStocksList(@RequestParam(value = "tickerSymbol") String tickerSymbol,
+                                                      @RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+                                                      @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd")LocalDate toDate){
+        return marketAnalyticsService.tradingHistoryForStocksList(tickerSymbol, fromDate, toDate);
+    }
 
     @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
     public ResponseEntity generateExceptionResponse(Exception e){

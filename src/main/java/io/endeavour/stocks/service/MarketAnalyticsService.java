@@ -4,15 +4,13 @@ import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
 import io.endeavour.stocks.entity.stocks.*;
 import io.endeavour.stocks.repository.stocks.*;
-import io.endeavour.stocks.vo.StockFundamentalsWithNamesVO;
-import io.endeavour.stocks.vo.StocksPriceHistoryVO;
-import io.endeavour.stocks.vo.TopStockBySectorVO;
-import io.endeavour.stocks.vo.TopThreeStockVO;
+import io.endeavour.stocks.vo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -162,6 +160,50 @@ public class MarketAnalyticsService {
 
     public List<StockFundamentals> getTopNStocksCriteriaAPI(Integer number){
         return stockFundamentalsWithNamesDao.getTopNStocksCriteriaAPI(number);
+    }
+
+    public StockHistoryVO tradingHistoryForStocksList(String tickerSymbol,
+                                                      LocalDate fromDate,
+                                                      LocalDate toDate){
+
+
+        List<TradingHistoryForStocksVO>  tradingHistoryForStocksList=stockPriceHistoryRepository.tradingHistoryForStocksList(tickerSymbol, fromDate, toDate);
+
+
+        Map<BigDecimal, Map<BigDecimal,List<TradingHistoryForStocksVO>>> firstMap=tradingHistoryForStocksList.stream()
+                .collect(Collectors.groupingBy(TradingHistoryForStocksVO::getMarketCap,Collectors.groupingBy(TradingHistoryForStocksVO::getCurrentRatio)));
+
+
+        BigDecimal marketCaps = firstMap.keySet().iterator().next();
+
+        Map<BigDecimal, List<TradingHistoryForStocksVO>> secondMap = firstMap.get(marketCaps);
+
+
+        BigDecimal currentRatios= secondMap.keySet().iterator().next();
+
+        StockHistoryVO stockHistoryVO=new StockHistoryVO();
+
+        stockHistoryVO.setMarketCap(marketCaps);
+        stockHistoryVO.setCurrentRatio(currentRatios);
+
+        List<TradingHistoryVO> tradingHistoryVOList=new ArrayList<>();
+
+        for (TradingHistoryForStocksVO list : secondMap.get(currentRatios)) {
+            TradingHistoryVO tradingHistoryVO = new TradingHistoryVO();
+            tradingHistoryVO.setTickerSymbol(list.getTickerSymbol());
+            tradingHistoryVO.setClosePrice(list.getClosePrice());
+            tradingHistoryVO.setVolume(list.getVolume());
+            tradingHistoryVO.setTradingDate(list.getTradingDate());
+            tradingHistoryVO.setTickerName(list.getTickerName());
+
+            tradingHistoryVOList.add(tradingHistoryVO);
+        }
+
+        stockHistoryVO.setTradinghistory(tradingHistoryVOList);
+
+
+
+        return stockHistoryVO;
     }
 
 }
