@@ -173,9 +173,9 @@ public class StocksController {
     @GetMapping(value = "getTopNPerformingStocksBySubSector/{number}")
     public List<StocksBySubSectorVO> getTopNPerformingStocksBySubSector(@PathVariable(value = "number") Integer number,
                                                                         @RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
-                                                                        @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
-                                                                        @RequestParam(value = "marketCapLimit") Long marketCapLimit){
-        return marketAnalyticsService.getTopNPerformingStocksBySubSector(number, fromDate, toDate, marketCapLimit);
+                                                                        @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate)
+    {
+        return marketAnalyticsService.getTopNPerformingStocksBySubSector(number, fromDate, toDate);
     }
 
     @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})

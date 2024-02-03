@@ -7,7 +7,7 @@ import java.util.List;
 public class StocksBySubSectorVO {
     private String sectorName;
     private String subSectorName;
-    private List<StockFundamentalsWithNamesVO> topStocks;
+    private List<StocksWithNameAndCumulativeReturnsVO> topStocks;
 
     public String getSectorName() {
         return sectorName;
@@ -25,11 +25,11 @@ public class StocksBySubSectorVO {
         this.subSectorName = subSectorName;
     }
 
-    public List<StockFundamentalsWithNamesVO> getTopStocks() {
+    public List<StocksWithNameAndCumulativeReturnsVO> getTopStocks() {
         return topStocks;
     }
 
-    public void setTopStocks(List<StockFundamentalsWithNamesVO> topStocks) {
+    public void setTopStocks(List<StocksWithNameAndCumulativeReturnsVO> topStocks) {
         this.topStocks = topStocks;
     }
 
