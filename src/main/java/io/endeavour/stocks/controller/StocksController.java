@@ -160,6 +160,15 @@ public class StocksController {
         return marketAnalyticsService.tradingHistoryForStocksList(tickerSymbol, fromDate, toDate);
     }
 
+
+    @GetMapping(value = "getTopNPerformingStocks/{number}")
+    public List<StockFundamentalsWithNamesVO> getTopNPerformingStocks(@PathVariable(value = "number") Integer number,
+                                                                      @RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+                                                                      @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
+                                                                      @RequestParam(value = "marketCapLimit") Long marketCapLimit){
+       return marketAnalyticsService.getTopNPerformingStocks(number, fromDate, toDate, marketCapLimit);
+    }
+
     @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})
     public ResponseEntity generateExceptionResponse(Exception e){
         return ResponseEntity.badRequest().body(e.getMessage());

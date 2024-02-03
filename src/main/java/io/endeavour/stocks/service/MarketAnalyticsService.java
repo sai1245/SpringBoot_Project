@@ -3,6 +3,9 @@ package io.endeavour.stocks.service;
 import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
 import io.endeavour.stocks.entity.stocks.*;
+import io.endeavour.stocks.remote.StockCalculationsClient;
+import io.endeavour.stocks.remote.vo.CRWSInputVO;
+import io.endeavour.stocks.remote.vo.CRWSOutputVO;
 import io.endeavour.stocks.repository.stocks.*;
 import io.endeavour.stocks.vo.*;
 import org.slf4j.Logger;
@@ -34,6 +37,9 @@ public class MarketAnalyticsService {
 
     @Autowired
     StockPriceHistoryRepository stockPriceHistoryRepository;
+
+    @Autowired
+    StockCalculationsClient stockCalculationsClient;
 
 
     @Autowired
@@ -204,6 +210,48 @@ public class MarketAnalyticsService {
 
 
         return stockHistoryVO;
+    }
+
+
+    public List<StockFundamentalsWithNamesVO> getTopNPerformingStocks(Integer number, LocalDate fromDate, LocalDate toDate, Long marketCapLimit){
+
+//        List<StockFundamentals> allStocksList = stockFundamentalsRepository.findAll();
+
+        List<StockFundamentalsWithNamesVO> allStocksList= stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
+
+        List<String> allTickerList = allStocksList.stream()
+                .map(StockFundamentalsWithNamesVO::getTickerSymbol)
+                .collect(Collectors.toList());
+        LOGGER.info("Number of stocks that are being sent as input to the cumulative return web service is : {}",allStocksList.size());
+        CRWSInputVO crwsInputVO = new CRWSInputVO();
+        crwsInputVO.setTickers(allTickerList);
+
+
+        List<CRWSOutputVO> cumulativeReturnsList = stockCalculationsClient.getCumulativeReturns(fromDate, toDate, crwsInputVO);
+
+        LOGGER.info("Number of stocls returns form the cumulative returns webservice is :{}",cumulativeReturnsList.size());
+
+
+        Map<String, BigDecimal> cumulativeReturnsByTickerSymbolMap = cumulativeReturnsList.stream()
+                .collect(Collectors.toMap(
+                        CRWSOutputVO::getTickerSymbol,
+                        CRWSOutputVO::getCumulativeReturn
+                ));
+
+
+        allStocksList.forEach(stockFundamentals -> stockFundamentals
+                .setCumulativeReturn(cumulativeReturnsByTickerSymbolMap
+                        .get(stockFundamentals.getTickerSymbol())));
+
+        List<StockFundamentalsWithNamesVO> collect = allStocksList.stream()
+                .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() != null)
+                .filter(stockFundamentals -> stockFundamentals.getMarketCap().compareTo(new BigDecimal(marketCapLimit)) > 0)
+                .sorted(Comparator.comparing(StockFundamentalsWithNamesVO::getCumulativeReturn).reversed())
+                .limit(number)
+                .collect(Collectors.toList());
+
+
+        return collect;
     }
 
 }

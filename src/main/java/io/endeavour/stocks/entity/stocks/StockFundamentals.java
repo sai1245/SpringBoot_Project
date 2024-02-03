@@ -94,6 +94,18 @@ public class StockFundamentals {
     @Column(name = "current_ratio")
     private BigDecimal currentRatio;
 
+    @Transient
+    private BigDecimal cumulativeReturn;
+
+    public BigDecimal getCumulativeReturn() {
+        return cumulativeReturn;
+    }
+
+    public void setCumulativeReturn(BigDecimal cumulativeReturn) {
+        this.cumulativeReturn = cumulativeReturn;
+    }
+
+
     @OneToOne
     @JoinColumn(name = "sector_id", referencedColumnName = "sector_id")
     private SectorLookup sectorLookup;
@@ -111,14 +123,14 @@ public class StockFundamentals {
 //    @JoinColumn(name = "ticker_symbol", referencedColumnName = "ticker_symbol")
 //    @MapsId
 //    public StocksLookup stocksLookup;
-
-    public int getSectorId(){
-        return sectorLookup.getSectorID();
-    }
-
-    public String getSectorName(){
-        return sectorLookup.getSectorName();
-    }
+//
+//    public int getSectorId(){
+//        return sectorLookup.getSectorID();
+//    }
+//
+//    public String getSectorName(){
+//        return sectorLookup.getSectorName();
+//    }
 
     public int getSubSectorId(){
         return subSectorLookup.getSubSectorID();
