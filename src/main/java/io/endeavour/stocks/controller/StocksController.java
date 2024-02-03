@@ -1,6 +1,7 @@
 package io.endeavour.stocks.controller;
 
 import io.endeavour.stocks.entity.stocks.*;
+import io.endeavour.stocks.remote.vo.StocksBySubSectorVO;
 import io.endeavour.stocks.service.MarketAnalyticsService;
 import io.endeavour.stocks.vo.*;
 import org.slf4j.Logger;
@@ -167,6 +168,14 @@ public class StocksController {
                                                                       @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
                                                                       @RequestParam(value = "marketCapLimit") Long marketCapLimit){
        return marketAnalyticsService.getTopNPerformingStocks(number, fromDate, toDate, marketCapLimit);
+    }
+
+    @GetMapping(value = "getTopNPerformingStocksBySubSector/{number}")
+    public List<StocksBySubSectorVO> getTopNPerformingStocksBySubSector(@PathVariable(value = "number") Integer number,
+                                                                        @RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+                                                                        @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
+                                                                        @RequestParam(value = "marketCapLimit") Long marketCapLimit){
+        return marketAnalyticsService.getTopNPerformingStocksBySubSector(number, fromDate, toDate, marketCapLimit);
     }
 
     @ExceptionHandler({IllegalArgumentException.class, SQLException.class, NullPointerException.class})

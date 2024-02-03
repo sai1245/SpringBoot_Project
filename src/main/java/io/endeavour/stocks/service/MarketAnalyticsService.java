@@ -6,6 +6,7 @@ import io.endeavour.stocks.entity.stocks.*;
 import io.endeavour.stocks.remote.StockCalculationsClient;
 import io.endeavour.stocks.remote.vo.CRWSInputVO;
 import io.endeavour.stocks.remote.vo.CRWSOutputVO;
+import io.endeavour.stocks.remote.vo.StocksBySubSectorVO;
 import io.endeavour.stocks.repository.stocks.*;
 import io.endeavour.stocks.vo.*;
 import org.slf4j.Logger;
@@ -252,6 +253,54 @@ public class MarketAnalyticsService {
 
 
         return collect;
+    }
+
+    public List<StocksBySubSectorVO> getTopNPerformingStocksBySubSector(Integer number, LocalDate fromDate, LocalDate toDate, Long marketCapLimit){
+
+        List<StockFundamentalsWithNamesVO> allStocksList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
+
+        List<String> allTickerList = allStocksList.stream()
+                .map(StockFundamentalsWithNamesVO::getTickerSymbol)
+                .collect(Collectors.toList());
+
+        CRWSInputVO crwsInputVO = new CRWSInputVO();
+        crwsInputVO.setTickers(allTickerList);
+
+
+        List<CRWSOutputVO> cumulativeReturnsList = stockCalculationsClient.getCumulativeReturns(fromDate, toDate, crwsInputVO);
+
+        Map<String, BigDecimal> cumulativeReturnsByTickerSymbolMap = cumulativeReturnsList.stream()
+                .collect(Collectors.toMap(
+                        CRWSOutputVO::getTickerSymbol,
+                        CRWSOutputVO::getCumulativeReturn
+                ));
+
+
+        allStocksList.forEach(stockFundamentals -> stockFundamentals
+                .setCumulativeReturn(cumulativeReturnsByTickerSymbolMap
+                        .get(stockFundamentals.getTickerSymbol())));
+
+        Map<String, List<StockFundamentalsWithNamesVO>> subSectorGroupingMap = allStocksList.stream()
+                .collect(Collectors.groupingBy(StockFundamentalsWithNamesVO::getSubSectorName));
+
+        List<StocksBySubSectorVO> stocksBySubSectorVOList = new ArrayList<>();
+
+        subSectorGroupingMap.forEach((subSector,Stocks)->{
+            StocksBySubSectorVO stocksBySubSectorVO=new StocksBySubSectorVO();
+            stocksBySubSectorVO.setSubSectorName(subSector);
+            stocksBySubSectorVO.setSectorName(Stocks.get(0).getSectorName());
+            List<StockFundamentalsWithNamesVO> stocksList = Stocks.stream()
+                    .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() != null)
+                    .filter(stockFundamentals -> stockFundamentals.getMarketCap().compareTo(new BigDecimal(marketCapLimit)) > 0)
+                    .sorted(Comparator.comparing(StockFundamentalsWithNamesVO::getCumulativeReturn).reversed())
+                    .limit(number)
+                    .collect(Collectors.toList());
+            stocksBySubSectorVO.setTopStocks(stocksList);
+            stocksBySubSectorVOList.add(stocksBySubSectorVO);
+
+        });
+
+        return stocksBySubSectorVOList;
     }
 
 }
