@@ -214,6 +214,36 @@ public class MarketAnalyticsService {
         return stockHistoryVO;
     }
 
+    public List<StockFundamentalsWithNamesVO> referenceMethod(LocalDate fromDate, LocalDate toDate){
+        List<StockFundamentalsWithNamesVO> allStocksList= stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
+
+        List<String> allTickerList = allStocksList.stream()
+                .map(StockFundamentalsWithNamesVO::getTickerSymbol)
+                .collect(Collectors.toList());
+        LOGGER.info("Number of stocks that are being sent as input to the cumulative return web service is : {}",allStocksList.size());
+        CRWSInputVO crwsInputVO = new CRWSInputVO();
+        crwsInputVO.setTickers(allTickerList);
+
+
+        List<CRWSOutputVO> cumulativeReturnsList = stockCalculationsClient.getCumulativeReturns(fromDate, toDate, crwsInputVO);
+
+        LOGGER.info("Number of stocls returns form the cumulative returns webservice is :{}",cumulativeReturnsList.size());
+
+
+        Map<String, BigDecimal> cumulativeReturnsByTickerSymbolMap = cumulativeReturnsList.stream()
+                .collect(Collectors.toMap(
+                        CRWSOutputVO::getTickerSymbol,
+                        CRWSOutputVO::getCumulativeReturn
+                ));
+
+
+        allStocksList.forEach(stockFundamentals -> stockFundamentals
+                .setCumulativeReturn(cumulativeReturnsByTickerSymbolMap
+                        .get(stockFundamentals.getTickerSymbol())));
+
+        return allStocksList;
+    }
+
 
     public List<StockFundamentalsWithNamesVO> getTopNPerformingStocks(Integer number, LocalDate fromDate, LocalDate toDate, Long marketCapLimit){
 
@@ -258,28 +288,7 @@ public class MarketAnalyticsService {
 
     public List<StocksBySubSectorVO> getTopNPerformingStocksBySubSector(Integer number, LocalDate fromDate, LocalDate toDate){
 
-        List<StockFundamentalsWithNamesVO> allStocksList = stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
-
-        List<String> allTickerList = allStocksList.stream()
-                .map(StockFundamentalsWithNamesVO::getTickerSymbol)
-                .collect(Collectors.toList());
-
-        CRWSInputVO crwsInputVO = new CRWSInputVO();
-        crwsInputVO.setTickers(allTickerList);
-
-
-        List<CRWSOutputVO> cumulativeReturnsList = stockCalculationsClient.getCumulativeReturns(fromDate, toDate, crwsInputVO);
-
-        Map<String, BigDecimal> cumulativeReturnsByTickerSymbolMap = cumulativeReturnsList.stream()
-                .collect(Collectors.toMap(
-                        CRWSOutputVO::getTickerSymbol,
-                        CRWSOutputVO::getCumulativeReturn
-                ));
-
-
-        allStocksList.forEach(stockFundamentals -> stockFundamentals
-                .setCumulativeReturn(cumulativeReturnsByTickerSymbolMap
-                        .get(stockFundamentals.getTickerSymbol())));
+        List<StockFundamentalsWithNamesVO> allStocksList = referenceMethod(fromDate, toDate);
 
         Map<String, List<StockFundamentalsWithNamesVO>> subSectorGroupingMap = allStocksList.stream()
                 .collect(Collectors.groupingBy(StockFundamentalsWithNamesVO::getSubSectorName));
@@ -308,6 +317,8 @@ public class MarketAnalyticsService {
             stocksBySubSectorVO.setTopStocks(stocksList);
 
             stocksBySubSectorVOList.add(stocksBySubSectorVO);
+
+
 
         }
 
