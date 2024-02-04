@@ -1,5 +1,6 @@
 package io.endeavour.stocks.service;
 
+import io.endeavour.stocks.StockException;
 import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.dao.StockPriceHistoryDao;
 import io.endeavour.stocks.entity.stocks.*;
@@ -229,6 +230,10 @@ public class MarketAnalyticsService {
 
         LOGGER.info("Number of stocls returns form the cumulative returns webservice is :{}",cumulativeReturnsList.size());
 
+        if(cumulativeReturnsList==null||cumulativeReturnsList.isEmpty()){
+            throw new StockException("Web Service is down".toUpperCase());
+        }
+
 
         Map<String, BigDecimal> cumulativeReturnsByTickerSymbolMap = cumulativeReturnsList.stream()
                 .collect(Collectors.toMap(
@@ -249,31 +254,8 @@ public class MarketAnalyticsService {
 
 //        List<StockFundamentals> allStocksList = stockFundamentalsRepository.findAll();
 
-        List<StockFundamentalsWithNamesVO> allStocksList= stockFundamentalsWithNamesDao.getAllStockFundamentalsWithNamesVO();
+        List<StockFundamentalsWithNamesVO> allStocksList = referenceMethod(fromDate, toDate);
 
-        List<String> allTickerList = allStocksList.stream()
-                .map(StockFundamentalsWithNamesVO::getTickerSymbol)
-                .collect(Collectors.toList());
-        LOGGER.info("Number of stocks that are being sent as input to the cumulative return web service is : {}",allStocksList.size());
-        CRWSInputVO crwsInputVO = new CRWSInputVO();
-        crwsInputVO.setTickers(allTickerList);
-
-
-        List<CRWSOutputVO> cumulativeReturnsList = stockCalculationsClient.getCumulativeReturns(fromDate, toDate, crwsInputVO);
-
-        LOGGER.info("Number of stocls returns form the cumulative returns webservice is :{}",cumulativeReturnsList.size());
-
-
-        Map<String, BigDecimal> cumulativeReturnsByTickerSymbolMap = cumulativeReturnsList.stream()
-                .collect(Collectors.toMap(
-                        CRWSOutputVO::getTickerSymbol,
-                        CRWSOutputVO::getCumulativeReturn
-                ));
-
-
-        allStocksList.forEach(stockFundamentals -> stockFundamentals
-                .setCumulativeReturn(cumulativeReturnsByTickerSymbolMap
-                        .get(stockFundamentals.getTickerSymbol())));
 
         List<StockFundamentalsWithNamesVO> collect = allStocksList.stream()
                 .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() != null)
