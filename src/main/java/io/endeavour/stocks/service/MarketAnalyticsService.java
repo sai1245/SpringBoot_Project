@@ -52,6 +52,12 @@ public class MarketAnalyticsService {
         this.subSectorLookupRepository=subSectorLookupRepository;
     }
 
+
+    public List<SectorLookup> getAllSectorDetails(){
+        List<SectorLookup> all = sectorLookupRepository.findAll();
+        return all;
+    }
+
     public List<StocksPriceHistoryVO> getSingleStockPriceHistory(String tickerSymbol, LocalDate fromDate, LocalDate toDate,
                                                                  Optional<String> sortFieldOptional, Optional<String> sortDirectionOptional){
         List<StocksPriceHistoryVO> stockPriceHistoryList = stockPriceHistoryDao.getSingleStockPriceHistory(tickerSymbol, fromDate, toDate);

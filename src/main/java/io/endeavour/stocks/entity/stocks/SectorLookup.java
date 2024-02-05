@@ -1,5 +1,6 @@
 package io.endeavour.stocks.entity.stocks;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.endeavour.stocks.vo.TopThreeStockVO;
 
 import javax.persistence.*;
@@ -23,9 +24,11 @@ public class SectorLookup {
     @OneToMany(mappedBy = "sectorLookup", fetch = FetchType.EAGER)
     List<StockFundamentals> topStocksBySector;
 
+
     public List<StockFundamentals> getTopStocksBySector() {
         return topStocksBySector;
     }
+
 
     public void setTopStocksBySector(List<StockFundamentals> topStocksBySector) {
         this.topStocksBySector = topStocksBySector;

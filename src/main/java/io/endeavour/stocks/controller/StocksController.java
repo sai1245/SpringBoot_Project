@@ -27,6 +27,13 @@ public class StocksController {
 
     @Autowired
     MarketAnalyticsService marketAnalyticsService;
+
+
+    @CrossOrigin
+    @GetMapping(value = "/getAllSectorDetails")
+    public List<SectorLookup> getAllSectorDetails(){
+        return marketAnalyticsService.getAllSectorDetails();
+    }
     @GetMapping("/getSamplePriceHistory")
     public StocksPriceHistoryVO getSamplePriceHistory(){
         StocksPriceHistoryVO stocksPriceHistoryVO= new StocksPriceHistoryVO();
@@ -39,6 +46,7 @@ public class StocksController {
         return stocksPriceHistoryVO;
     }
 
+    @CrossOrigin
     @GetMapping(value ="getSingleStockPriceHistory/{tickerSymbol}" )
     public List<StocksPriceHistoryVO> getSingleStockPriceHistory(@PathVariable(name = "tickerSymbol") String tickerSymbol,
                                                                  @RequestParam(name = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
