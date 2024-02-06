@@ -1,6 +1,7 @@
 package io.endeavour.stocks.service;
 
 import io.endeavour.stocks.StockException;
+import io.endeavour.stocks.UnitTestBase;
 import io.endeavour.stocks.dao.StockFundamentalsWithNamesDao;
 import io.endeavour.stocks.remote.StockCalculationsClient;
 import io.endeavour.stocks.remote.vo.CRWSOutputVO;
@@ -19,9 +20,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@ActiveProfiles({"test"})       //test profile      //https://www.baeldung.com/spring-profiles
-class MarketAnalyticsServiceTest {
+//test profile      //https://www.baeldung.com/spring-profiles
+class MarketAnalyticsServiceTest extends UnitTestBase {
 
     @Autowired
     MarketAnalyticsService marketAnalyticsService;

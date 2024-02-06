@@ -35,11 +35,13 @@ public class Address {
 
 
     //Custom Method where a real PersonName field does not exist {Custom methods}
+    @JsonIgnore
     public String getPersonName(){
         return person.getFirstName()+" "+person.getLastName();
     }
 
     //Custom Method where a real Person id field does not exist { Custo Methods}
+@JsonIgnore
     public int getPersonId(){
         return person.getPersonID();
     }
